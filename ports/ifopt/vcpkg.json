@@ -1,0 +1,7 @@
+{
+    "name": "ifopt",
+    "version": "0.0.2",
+    "description": "An Eigen-based, light-weight C++ Interface to Nonlinear Programming Solvers (Ipopt, Snopt)",
+    "homepage": "https://github.com/ethz-adrl/ifopt",
+    "dependencies": []
+}

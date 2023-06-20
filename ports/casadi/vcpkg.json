@@ -1,0 +1,9 @@
+{
+    "name": "casadi",
+    "version": "3.6.3",
+    "description": "A symbolic algebra and autodiff toolbox",
+    "homepage": "https://github.com/casadi/casadi",
+    "dependencies": [
+        "vcpkg-cmake-config"
+    ]
+}

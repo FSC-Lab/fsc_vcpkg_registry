@@ -1,0 +1,12 @@
+{
+    "default": {
+        "casadi": {
+            "baseline": "3.6.3",
+            "port-version": 0
+        },
+        "ifopt": {
+            "baseline": "0.0.2",
+            "port-version": 0
+        }
+    }
+}
