@@ -1,0 +1,106 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bcb86c5..1233751 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -147,39 +147,69 @@ target_include_directories(basalt-headers INTERFACE
+ # List all header files with target_sources.
+ # This ensures, e.g., that QtCreator >= 6.0 properly recognize these headers to belong to the project.
+ # To support cmake < 3.13, use absolute paths (see: https://crascit.com/2016/01/31/enhanced-source-file-handling-with-target_sources/)
+-target_sources(basalt-headers
+-  INTERFACE
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/calibration/calib_bias.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/calibration/calibration.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/bal_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/camera_static_assert.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/double_sphere_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/extended_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/fov_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/generic_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/kannala_brandt_camera4.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/pinhole_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/stereographic_param.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/camera/unified_camera.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/image/image.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/image/image_pyr.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/imu/imu_types.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/imu/preintegration.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/serialization/eigen_io.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/serialization/headers_serialization.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/spline/ceres_local_param.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/spline/ceres_spline_helper.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/spline/rd_spline.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/spline/se3_spline.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/spline/so3_spline.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/spline/spline_common.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/utils/assert.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/utils/eigen_utils.hpp
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/utils/hash.h
+-    ${CMAKE_CURRENT_SOURCE_DIR}/include/basalt/utils/sophus_utils.hpp
+-)
+-
+ if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BASALT_HEADERS_BUILD_TESTING) AND BUILD_TESTING)
+   enable_testing()
+   add_subdirectory(test)
+ endif()
++
++if(PROJECT_IS_TOP_LEVEL)
++  set(CMAKE_INSTALL_INCLUDEDIR
++      "include/${PROJECT_NAME}-${PROJECT_VERSION}"
++      CACHE PATH "")
++endif()
++
++# Project is configured with no languages, so tell GNUInstallDirs the lib dir
++set(CMAKE_INSTALL_LIBDIR
++    lib
++    CACHE PATH "")
++
++include(CMakePackageConfigHelpers)
++include(GNUInstallDirs)
++
++# find_package(<package>) call for consumers to find this project
++set(package ${PROJECT_NAME})
++
++install(
++  DIRECTORY include/ ${CODEGEN_DIR}
++  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
++  COMPONENT ${PROJECT_NAME}_Development
++  FILES_MATCHING
++  PATTERN "*.h"
++  PATTERN "*.hpp")
++
++install(
++  TARGETS ${PROJECT_NAME}
++  EXPORT ${PROJECT_NAME}Targets
++  INCLUDES
++  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
++
++write_basic_package_version_file(
++  "${package}ConfigVersion.cmake" COMPATIBILITY SameMajorVersion
++                                                ARCH_INDEPENDENT)
++
++# Allow package maintainers to freely override the path for the configs
++set(${PROJECT_NAME}_INSTALL_CMAKEDIR
++    "${CMAKE_INSTALL_DATADIR}/${package}"
++    CACHE PATH "CMake package config location relative to the install prefix")
++mark_as_advanced(${PROJECT_NAME}_INSTALL_CMAKEDIR)
++
++install(
++  FILES install-config.cmake
++  DESTINATION "${${PROJECT_NAME}_INSTALL_CMAKEDIR}"
++  RENAME "${package}Config.cmake"
++  COMPONENT ${PROJECT_NAME}_Development)
++
++install(
++  FILES "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
++  DESTINATION "${${PROJECT_NAME}_INSTALL_CMAKEDIR}"
++  COMPONENT ${PROJECT_NAME}_Development)
++
++install(
++  EXPORT ${PROJECT_NAME}Targets
++  NAMESPACE basalt::
++  DESTINATION "${${PROJECT_NAME}_INSTALL_CMAKEDIR}"
++  COMPONENT ${PROJECT_NAME}_Development)
++
++if(PROJECT_IS_TOP_LEVEL)
++  include(CPack)
++endif()

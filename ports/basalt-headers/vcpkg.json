@@ -1,0 +1,11 @@
+{
+  "name": "basalt-headers",
+  "version": "0.0.1",
+  "description": "This repository contains reusable components of Basalt project as header-only library",
+  "homepage": "https://gitlab.com/VladyslavUsenko/basalt-headers",
+  "dependencies": [
+    "eigen3",
+    "sophus",
+    "cereal"
+  ]
+}
